@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+// 카테고리 선택에 따라 대 -> 중 -> 소 
+
+$(document).ready(function(){   //문서가 로드되면 실행할 함수를 정의
+    $(document).on('click', '.category_link', function(event){  // 'category_link' 클래스를 가진 요소를 클릭했을 때의 이벤트를 설정
+        event.preventDefault();  // 기본 링크 동작을 막음
+        var categoryCode = $(this).data("code"); //th:data-code="${category.code}"의 속성을 저장한다는 것
+        $("#profile_group1").val(categoryCode); //profile_group1는 id
+        $("#subCategoriesTable").empty(); //중분류 id (중분류 초기화)
+        $("#subCategoriesTable").append("<tr><th>중분류</th></tr>");
+        loadSubCategories(categoryCode); //서버에서 categoryCode에 해당하는 중분류 데이터를 가져오고, 테이블에 추가합니다.
+    });
+
+    $(document).on('click', '.subcategory_link', function(event){
+        event.preventDefault();
+        var subCategoryCode = $(this).data("code"); //code' 데이터 속성의 값을 가져와 subCategoryCode 변수에 저장
+     // 선택된 중분류 코드를 숨겨진 필드에 저장
+        $("#profile_sub1").val(subCategoryCode);
+        loadSteps(subCategoryCode); //서버에서 소분류 데이터를 받아오는 것
+    });
+    
+    $(document).on('click', '.step_link', function(event){
+        event.preventDefault();
+        var stepCode = $(this).data("code");
+        // 선택된 소분류 코드를 숨겨진 필드에 저장
+        $("#profile_step1").val(stepCode);
+    });
+
+    function loadSubCategories(categoryCode) {  //서브카테고리를 로드하는 함수를 정의
+        $.ajax({  //서버로 요청 보냄
+            type: "GET",
+            url: "/com_board_group", //요청을 보낼 서버의 URL을 설정
+            data: {"no": categoryCode}, //요청과 함께 보낼 데이터를 설정
+            dataType: "json", //응답 데이터의 형식
+            success: function(response){
+                $("#subCategoriesTable").empty(); //id
+                $("#subCategoriesTable").append("<tr><th>중분류</th></tr>");//서브카테고리 테이블에 헤더를 추가
+                $.each(response, function(index, subCategory){ //응답 데이터를 순회하면서 각각의 서브카테고리에 대해 작업
+                    var row = "<tr><td><a href='#' class='subcategory_link' data-code='" + subCategory.code + "'>" + subCategory.name + "</a></td></tr>";//이 행은 서브카테고리의 코드와 이름을 링크로 표시합니다. 코드는 data-code 속성으로 설정됨
+                    $("#subCategoriesTable").append(row);  //생성된 행 추가
+                });
+                $("#stepCategoriesTable").empty(); // 소분류 테이블 초기화
+                $("#stepCategoriesTable").append("<tr><th>소분류</th></tr>");
+            },
+            error: function(xhr, status, error){
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    function loadSteps(subCategoryCode) {
+        $.ajax({
+            type: "GET",
+            url: "/com_board_sub",
+            data: {"no": subCategoryCode},
+            dataType: "json",
+            success: function(response){
+                $("#stepCategoriesTable").empty();
+                $("#stepCategoriesTable").append("<tr><th>소분류</th></tr>");
+                $.each(response, function(index, step){
+                    var row = "<tr><td><a href='#' class='step_link' data-code='" + step.code + "'>" + step.name + "</a></td></tr>";
+                    $("#stepCategoriesTable").append(row);
+                });
+            },
+            error: function(xhr, status, error){
+                console.error("Error:", error);
+            }
+        });
+    }
+});
+
+   //학교분류에 따라 학교폼 가져오기
+   $(document).ready(function(){
+    $('#edu_kind').change(function(){
+        var selectedOption = $(this).val();
+        $('#edu_name').empty(); 
+        var row = "";
+        if (selectedOption === "0") {
+            row = `
+                <table border="1" width="80%">
+                <tr>
+                	<td>학교명:&nbsp;<input name="edu_name"></td>
+                	<td>졸업년도:&nbsp;<input name="edu_end_date"></td>
+                	<td>졸업상태:&nbsp;<input name="edu_status"></td>
+                </tr>
+            </table>
+        `;
+        } else if (selectedOption === "1" || selectedOption === "2") {
+            row =  `
+                <table border="1" width="80%">
+                <tr>
+                	<td>학교명:&nbsp;<input name="edu_name"></td>
+                	<td>입학년월:&nbsp;<input name="edu_start_date"></td>
+                	<td>졸업년도:&nbsp;<input name="edu_end_date"></td>
+                	<td>졸업상태:&nbsp;<input name="edu_status"></td>
+                </tr>
+                <tr>
+                	<td colspan="2">전공명:&nbsp;<input name="edu_major"></td>
+                	<td>학점:&nbsp;<input name="edu_hakjum"></td>
+                	<td>편입:&nbsp;
+                    <input type="radio" name="edu_transfer" value="yes"> 예
+                    <input type="radio" name="edu_transfer" value="no"> 아니오
+                </td>
+                </tr>
+            </table>
+        `;
+        } else if (selectedOption === "3") {
+        	  row =  `
+                  <table border="1" width="80%">
+                  <tr>
+                  	<td>학교명:&nbsp;<input name="edu_name"></td>
+                  	 <td>학위:&nbsp;
+                     	<select name="edu_degree">
+	                         <option value="9">석사</option>
+	                         <option value="8">박사</option>
+	                         <option value="7">석박사</option>
+                     	</select>
+                 	</td>
+                  	<td>입학년월:&nbsp;<input name="edu_start_date"></td>
+                  	<td>졸업년도:&nbsp;<input name="edu_end_date"></td>
+                  	<td>졸업상태:&nbsp;<input name="edu_status"></td>
+                  </tr>
+                  <tr>
+                  	<td colspan="2">전공명:&nbsp;<input name="edu_major"></td>
+                  	<td>학점:&nbsp;<input name="edu_hakjum"></td>
+                  </tr>
+              </table>
+          `;
+        }
+        $("#edu_name").append(row);
+        searchSchool(selectedOption);
+    });
+    
+  
+    
+   // 학교명 입력 폼에 입력할 때마다 학교명 검색
+    $(document).on('change', '#edu_name', function(){
+        var schoolName = $(this).val();
+        if(schoolName.length >= 2){ // 입력된 학교명이 2글자 이상일 때만 검색
+        	searchSchool($('#edu_kind').val());
+        }
+    }); 
+   
+   function searchSchool(selectedOption){
+        $.ajax({
+            type: 'GET',
+            url: "/com_edu_kind",
+            data: { "no": selectedOption},
+            success: function(response){
+                $.each(response, function(index, step){
+                    var option = $("<option>").attr("value", step.c_code).text(step.c_name);
+                    $("#edu_name").append(option);
+                });
+            },
+            error: function(xhr, status, error){
+                console.error("Error:", error);
+            }
+        });
+        } 
+});
+
+</script>
+
+
+</head>
+<body>
+	<div>
+		<form method="post" action="Profile">
+			<textarea rows="5" cols="200" name="com_board_title"
+				placeholder="기업에게 나에 대해 알려줍니다.강점,목표,관심분야도 좋아요."></textarea>
+			<h2>인적사항</h2>
+			<span>*필수 입력 정보입니다.</span>
+			<table border="1" width="80%">
+				<tr>
+					<td>이름:&nbsp;<input name="user_name"></td>
+					<td>생년월일:&nbsp;<input name="user_birth"></td>
+					<td>성별:&nbsp;<input name="user_gender"></td>
+					<td rowspan="2">사진 <input type="file" name="profile_image"></td>
+				</tr>
+				<tr>
+					<td>휴대폰번호:&nbsp;<input name="user_phone"></td>
+					<td>이메일:&nbsp;<input name="user_email"></td>
+					<td>주소:&nbsp;<input name="user_addr"></td>
+				</tr>
+			</table>
+
+			<br>
+			<br>
+
+			<div>
+				<h2>희망직무</h2>
+				<table border="1" width="80%">
+					<tr>
+						<th>대분류</th>
+					</tr>
+					<tr th:each="category : ${categories}">
+						<td class="category_link" >
+							<a href="#" class="category_link" th:data-code="${category.code}" th:text="${category.code}"></a>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<br>
+			<br>
+
+			<div>
+				<h2>중분류</h2>
+				<table border="1" width="80%" id="subCategoriesTable">
+					<tr>
+						<th>중분류</th>
+					</tr>
+				</table>
+			</div>
+
+			<br>
+			<br>
+
+			<div>
+				<h2>소분류</h2>
+				<table border="1" width="80%" id="stepCategoriesTable">
+					<tr>
+						<th>소분류</th>
+					</tr>
+					<tr th:each="categorystep : ${categorystep}">
+						<td><a th:href="@{com_board_group(no=${categorystep.code})}"
+							th:text="${categorystep.code}">${categorystep.code}</a></td>
+					</tr>
+
+				</table>
+			</div>
+		 	<!-- 선택된 카테고리 값을 저장할 숨겨진 필드들 -->
+            <input type="hidden" name="profile_group1" id="profile_group1">
+            <input type="hidden" name="profile_sub1" id="profile_sub1">
+            <input type="hidden" name="profile_step1" id="profile_step1">
+
+
+			<br>
+			<br>
+			<h2>학력</h2>
+			
+		      <h2>학교구분:</h2>
+		        <select id="edu_kind" name="edu_kind">
+		            <option value="0">고등학교</option>
+		            <option value="1">대학(2,3년)</option>
+		            <option value="2">대학교(4년)</option>
+		            <option value="3">대학원</option>
+		        </select>
+	       <div id="edu_name"></div>
+	       
+	       
+				<!-- <table border="1" width="80%">
+				<tr>
+					<td>학교명:&nbsp;<input name="edu_name"></td>
+					<td>전공명:&nbsp;<input name="edu_major"></td>
+					<td>입학년도:&nbsp;<input name="edu_start_date"></td>
+					<td>졸업년도:&nbsp;<input name="edu_end_date"></td>
+					<td>졸업상태:&nbsp;<input name="edu_status"></td>
+					</tr>
+					<tr>
+					<td>편입여부:&nbsp;
+					<input name="edu_transfer"></td>
+					<td>학위:&nbsp;
+					<select name="edu_degree">
+						<option></option>
+						<option></option>
+						<option></option>
+					</select>
+					</td>
+					<td>학점:&nbsp;<input name="edu_hakjum"></td>
+				</tr>
+				<tr>
+					<td>
+					 <input type="file" name="edu_nonmun" value="졸업논문">
+					</td>
+				</tr>
+			</table>
+ -->
+			<br>
+			<br>
+			<h2>경력</h2>
+			<table border="1" width="80%">
+				<tr>
+					<td>근무지:&nbsp;<input name="career_loc"></td>
+					<td>입사년월:&nbsp;<input name="career_start_date"></td>
+					<td>퇴사년월:&nbsp;<input name="career_end_date"></td>
+
+				</tr>
+				<tr>
+					<td>직급/직책:&nbsp;<input name="career_position"></td>
+					<td colspan="2">연봉:&nbsp;<input name="career_sal"></td>
+				</tr>
+				<tr>
+					<td>근무지:&nbsp;<input name="career_loc"></td>
+					<td>입사년월:&nbsp;<input name="career_start_date"></td>
+					<td>퇴사년월:&nbsp;<input name="career_end_date"></td>
+
+				</tr>
+				<tr>
+					<td>직급/직책:&nbsp;<input name="career_position"></td>
+					<td colspan="2">연봉:&nbsp;<input name="career_sal"></td>
+				</tr>
+
+			</table>
+
+			<br>
+			<br>
+			<h2>경력</h2>
+			<table border="1" width="80%">
+				<tr>
+					<td>자격증명:&nbsp;<input name="license_name"></td>
+					<td>발행처:&nbsp;<input name="license_barhang"></td>
+					<td>취득월년:&nbsp;<input name="license_date"></td>
+				</tr>
+			</table>
+
+			<br>
+			<br>
+			<h2>포트폴리오</h2>
+			<div align="center">
+				<table border="1" width="80%">
+					<tr>
+						<input type="file">
+					</tr>
+				</table>
+			</div>
+
+			<br>
+			<br>
+			<h2>희망연봉</h2>
+			<div align="center">
+				<table border="1" width="80%">
+					<tr>
+						<td>고용형태:&nbsp;<input name=""></td>
+						<td>희망연봉:&nbsp;<input name=""></td>
+					</tr>
+				</table>
+			</div>
+
+			<br>
+			<br>
+			<h2>이력서 공개여부</h2>
+			<div align="center">
+				<input type="radio" name=""> 공개 <input type="radio" name="">
+				비공개
+			</div>
+
+			<br>
+			<br>
+			<div align="center">
+				<input type="submit" value="이력서 저장">&nbsp;&nbsp;&nbsp; <input
+					type="reset" value="다시작성">
+			</div>
+		</form>
+	</div>
+</body>
+</html>
