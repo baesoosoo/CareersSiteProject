@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div>
+		<div> <!--이력서 타이틀 -->
+		<h1>이력서 관리</h1>
+		<input type="button" value="이력서 등록" th:onclick ="|location.href='@{profile_write}'|">
+		</div>
+		
+		<div> <!-- 이력서 목록 -->
+		<br>
+			<table border="1" width="600">
+			<tr>
+				<th>이력서 제목</th>
+				<th>이력서 관리</th>
+			</tr>
+			<tr th:if="${not #strings.isEmpty(ProfileList)}" th:each="dto : ${ProfileList}">
+				<td>
+				<a th:href="@{profile_content(no=${dto.profile_key})}" th:text="${dto.profile_name}"></a></td>
+				<td>
+					<input type="button" value="수정" th:onclick="location.href='@{profile_modify}'|">
+					<input type="button" value="삭제" th:onclick="location.href='@{profile_delect}'|">
+				</td>
+			</tr>
+			<tr th:if="${#strings.isEmpty(ProfileList)}">
+				<td colspan="2" align="center">
+					<h2>이력서 목록이 비어 있습니다..</h2>
+				</td>
+			</tr>
+			</table>
+		</div>
+		
+	
+	</div>
+
+</body>
+</html>

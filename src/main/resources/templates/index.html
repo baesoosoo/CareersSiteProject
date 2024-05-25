@@ -141,10 +141,10 @@ $(document).ready(function(){   //문서가 로드되면 실행할 함수를 정
   
     
    // 학교명 입력 폼에 입력할 때마다 학교명 검색
-    $(document).on('change', '#edu_name', function(){
+    $(document).on('input', '#edu_name', function(){
         var schoolName = $(this).val();
         if(schoolName.length >= 2){ // 입력된 학교명이 2글자 이상일 때만 검색
-        	searchSchool($('#edu_kind').val());
+        	searchSchool(schoolName);
         }
     }); 
    
@@ -244,6 +244,7 @@ $(document).ready(function(){   //문서가 로드되면 실행할 함수를 정
 
 			<br>
 			<br>
+			 <div id="edu_div">
 			<h2>학력</h2>
 			
 		      <h2>학교구분:</h2>
@@ -254,35 +255,8 @@ $(document).ready(function(){   //문서가 로드되면 실행할 함수를 정
 		            <option value="3">대학원</option>
 		        </select>
 	       <div id="edu_name"></div>
-	       
-	       
-				<!-- <table border="1" width="80%">
-				<tr>
-					<td>학교명:&nbsp;<input name="edu_name"></td>
-					<td>전공명:&nbsp;<input name="edu_major"></td>
-					<td>입학년도:&nbsp;<input name="edu_start_date"></td>
-					<td>졸업년도:&nbsp;<input name="edu_end_date"></td>
-					<td>졸업상태:&nbsp;<input name="edu_status"></td>
-					</tr>
-					<tr>
-					<td>편입여부:&nbsp;
-					<input name="edu_transfer"></td>
-					<td>학위:&nbsp;
-					<select name="edu_degree">
-						<option></option>
-						<option></option>
-						<option></option>
-					</select>
-					</td>
-					<td>학점:&nbsp;<input name="edu_hakjum"></td>
-				</tr>
-				<tr>
-					<td>
-					 <input type="file" name="edu_nonmun" value="졸업논문">
-					</td>
-				</tr>
-			</table>
- -->
+	       </div>
+	
 			<br>
 			<br>
 			<h2>경력</h2>
@@ -355,8 +329,8 @@ $(document).ready(function(){   //문서가 로드되면 실행할 함수를 정
 			<br>
 			<br>
 			<div align="center">
-				<input type="submit" value="이력서 저장">&nbsp;&nbsp;&nbsp; <input
-					type="reset" value="다시작성">
+				<input type="submit" value="이력서 저장">&nbsp;&nbsp;&nbsp; 
+				<input type="reset" value="다시작성">
 			</div>
 		</form>
 	</div>

@@ -6,9 +6,14 @@
   
   <configuration>
   		<typeAliases>
-  			<typeAlias type="com.goott.Board2.model.Board" alias="Board"/>
-  			<typeAlias type="com.goott.Board2.model.Category" alias="Category"/>
-  			<typeAlias type="com.goott.Board2.model.School" alias="School"/>
+  			<typeAlias type="com.goott.Board2.model.FileDTO" alias="FileDTO"/>
+  			<typeAlias type="com.goott.Board2.model.license" alias="license"/>
+  			<typeAlias type="com.goott.Board2.model.CodeDTO" alias="codeDTO"/>
+  			<typeAlias type="com.goott.Board2.model.ProfileDTO" alias="ProfileDTO"/>
+  			<typeAlias type="com.goott.Board2.model.CareerDTO" alias="CareerDTO"/>
+  			<typeAlias type="com.goott.Board2.model.EduDTO" alias="EduDTO"/>
+  			<typeAlias type="com.goott.Board2.model.LicenseDTO" alias="LicenseDTO"/>
+  			<typeAlias type="com.goott.Board2.model.UserDTO" alias="UserDTO"/>
   		</typeAliases>
   </configuration>
   
