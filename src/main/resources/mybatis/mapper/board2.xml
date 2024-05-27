@@ -4,23 +4,23 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-  <mapper namespace="BoardDAO">
+  <mapper namespace="com.goott.Board2.model.BoardMapper">
   
   	
-  	<select id="Category" resultType="codeDTO">
+  	<select id="category" resultType="codeDTO">
   	
 	select * from jobData where length(code)=2
   	
   	</select>
  
-  	<select id="Categorysub" parameterType="String" resultType="codeDTO">
+  	<select id="categorysub" parameterType="String" resultType="codeDTO">
   	
 	   select * from jobData where length(code) = 3 and code like #{no} || '%'
   	
   	</select>
   	
   	
-  	<select id="Categorystep" parameterType="String" resultType="codeDTO">
+  	<select id="categorystep" parameterType="String" resultType="codeDTO">
   	
 	   select * from jobData where length(code) = 4 and code like #{no} || '%'
   	
@@ -49,7 +49,7 @@
   	
   	</select>
   	
-  	<select id="Con" parameterType="int" resultType="ProfileDTO">
+  	<select id="con" parameterType="int" resultType="ProfileDTO">
   	
 	select * from profile where profile_key = #{no}
 	

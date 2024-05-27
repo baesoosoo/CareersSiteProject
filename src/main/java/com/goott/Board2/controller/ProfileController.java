@@ -13,35 +13,37 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import com.goott.Board2.File.UploadFileService;
 
-import com.goott.Board2.model.BoardDAOImpl;
+import com.goott.Board2.model.BoardMapper;
 import com.goott.Board2.model.CareerDTO;
 import com.goott.Board2.model.CodeDTO;
 import com.goott.Board2.model.CodeListDTO;
 import com.goott.Board2.model.EduDTO;
-import com.goott.Board2.model.FileDTO;
 import com.goott.Board2.model.LicenseDTO;
 import com.goott.Board2.model.ProfileDTO;
 import com.goott.Board2.model.UserDTO;
 import com.goott.Board2.model.license;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Controller
 public class ProfileController {
-	
-	@Autowired
-	private final BoardDAOImpl boardDAOImpl;
+
 	
 	@Autowired
 	UploadFileService uploadFileService;
 	
+	@Autowired
+	private BoardMapper mapper;
+	
 	// 파일 업로드
 	@PostMapping("fileUpload")
-	public String Profile(ProfileDTO dto) {
+	public String Profile(ProfileDTO dto,@RequestParam("edu_kind") int[] eduKind,
+            @RequestParam("edu_name") String[] eduName,
+            @RequestParam("edu_start_date") String[] eduStartDate,
+            @RequestParam("edu_end_date") String[] eduEndDate) {
 		
 		MultipartFile profileImage = dto.getProfile_image(); //MultipartFile에 넣어주기만 함(upload 메서드에서 string으로 변환해줘야하기 때문)
-		MultipartFile profilePpt = dto.getProfile_ppt(); //MultipartFile에 넣어주기만 함(upload 메서드에서 string으로 변환해줘야하기 때문)
+		MultipartFile profilePpt = dto.getProfile_ppt(); 
 		
 		// 파일 경로 설정 및 성공 여부
 		//파일 이름이 넘어옴
@@ -70,7 +72,8 @@ public class ProfileController {
 	@GetMapping("/test")
 	public String categorygrouptest(Model model) {
 		
-		List<CodeDTO> category = this.boardDAOImpl.categoryList();
+		List<CodeDTO> category = this.mapper.category();
+		
 		
 		model.addAttribute("categories", category);
 		
@@ -82,7 +85,7 @@ public class ProfileController {
 	@ResponseBody
 	public List<CodeDTO> categorysub(@RequestParam("no") String no) {
 		
-		List<CodeDTO> categorysub = this.boardDAOImpl.categorysub(no);
+		List<CodeDTO> categorysub = this.mapper.categorysub(no);
 		
 		return categorysub;
 	}
@@ -92,7 +95,7 @@ public class ProfileController {
 	@ResponseBody
 	public List<CodeDTO> categorystep(@RequestParam("no")String no) {
 		
-		List<CodeDTO> categorystep =  this.boardDAOImpl.categorystep(no);
+		List<CodeDTO> categorystep =  this.mapper.categorystep(no);
 		
 
 		return categorystep;
@@ -105,7 +108,7 @@ public class ProfileController {
 	@ResponseBody
 	public List<CodeDTO> schoolName(CodeDTO dto){
 			
-		List<CodeDTO> schoolName = this.boardDAOImpl.schoolname(dto);
+		List<CodeDTO> schoolName = this.mapper.schoolname(dto);
 		
 		return schoolName;
 		
@@ -116,7 +119,7 @@ public class ProfileController {
 	@ResponseBody
 	public List<CodeDTO> departmentName(CodeDTO dto){
 	
-		List<CodeDTO> departmentName = this.boardDAOImpl.departmentCode(dto);
+		List<CodeDTO> departmentName = this.mapper.department(dto);
 		
 		return departmentName;
 		
@@ -127,7 +130,7 @@ public class ProfileController {
 	@ResponseBody
 	public List<license> searchlicense(@RequestParam("license_name") String license_name){
 		
-		List<license> licenseList = this.boardDAOImpl.searchlicense(license_name);
+		List<license> licenseList = this.mapper.license(license_name);
 		
 		
 		return licenseList;
@@ -154,7 +157,7 @@ public class ProfileController {
 	@GetMapping("profile_list")
 	public String profileList(Model model) {
 		
-		List<ProfileDTO> profileList = this.boardDAOImpl.profileList();
+		List<ProfileDTO> profileList = this.mapper.profileList();
 		
 		model.addAttribute("ProfileList", profileList);
 		
@@ -165,12 +168,12 @@ public class ProfileController {
 	@GetMapping("profile_content")
 	public String profileContent(@RequestParam("no") int no,Model model) {
 		
-		ProfileDTO dto = this.boardDAOImpl.profileContent(no);
+		ProfileDTO dto = this.mapper.con(no);
 	    
-		UserDTO user = this.boardDAOImpl.getuserinfo(no);
-		List<EduDTO> eduList = this.boardDAOImpl.getEducationList(no);
-		List<CareerDTO> careerList = this.boardDAOImpl.getCareerList(no);
-		List<LicenseDTO> licenseList = this.boardDAOImpl.getLicenseList(no);
+		UserDTO user = this.mapper.userinfo(no);
+		List<EduDTO> eduList = this.mapper.eduList(no);
+		List<CareerDTO> careerList = this.mapper.careerList(no);
+		List<LicenseDTO> licenseList = this.mapper.licenseList(no);
 	
 		
 	    model.addAttribute("Content", dto)
