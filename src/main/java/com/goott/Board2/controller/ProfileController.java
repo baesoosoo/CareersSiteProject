@@ -36,34 +36,37 @@ public class ProfileController {
 	@Autowired
 	UploadFileService uploadFileService;
 	
-	
-	@PostMapping("")
-	public String Profile(FileDTO f_dto) {
+	// 파일 업로드
+	@PostMapping("fileUpload")
+	public String Profile(ProfileDTO dto) {
 		
-		MultipartFile file = f_dto.getProfile_ppt(); //MultipartFile에 넣어주기만 함(upload 메서드에서 string으로 변환해줘야하기 때문)
+		MultipartFile profileImage = dto.getProfile_image(); //MultipartFile에 넣어주기만 함(upload 메서드에서 string으로 변환해줘야하기 때문)
+		MultipartFile profilePpt = dto.getProfile_ppt(); //MultipartFile에 넣어주기만 함(upload 메서드에서 string으로 변환해줘야하기 때문)
 		
 		// 파일 경로 설정 및 성공 여부
 		//파일 이름이 넘어옴
-		String savedFileName = uploadFileService.upload(file);
+		String savedImageName = uploadFileService.upload(profileImage);
+		String savedPptName = uploadFileService.upload(profilePpt);
 		
-		if (savedFileName != null) {
-			f_dto.setProfile_image(savedFileName);//이미지에 넣어주기
+		 if (savedImageName != null && savedPptName != null) {
+		        dto.setProfile_image_name(savedImageName);
+		        dto.setProfile_ppt_name(savedPptName);
+		    } else {
+		        return "uploadFail"; 
+		    }
 
-		} 
-		return "";
+		    return "uploadSuccess";
 	}
 	
-	@GetMapping("/")
-	public String categorygroup(Model model) {
+	
+	@GetMapping("/file")
+	public String categorygroup() {
+	
 		
-		
-		List<CodeDTO> category = this.boardDAOImpl.categoryList();
-		
-		model.addAttribute("categories", category);
-		
-		return "index";
+		return "filetest";
 	}
 	
+	//이력서 작성 폼
 	@GetMapping("/test")
 	public String categorygrouptest(Model model) {
 		
@@ -74,6 +77,7 @@ public class ProfileController {
 		return "profile";
 	}
 	
+	// 대분류 카테고리
 	@PostMapping("com_board_group")
 	@ResponseBody
 	public List<CodeDTO> categorysub(@RequestParam("no") String no) {
@@ -83,6 +87,7 @@ public class ProfileController {
 		return categorysub;
 	}
 	
+	// 중분류 카테고리 
 	@PostMapping("com_board_sub")
 	@ResponseBody
 	public List<CodeDTO> categorystep(@RequestParam("no")String no) {
@@ -95,51 +100,41 @@ public class ProfileController {
 	}
 	
 
-	
+	// 학교구분과 학교 이름 검색 시 해당 학교 리스트 불러오기
 	@PostMapping("search_school_by_name")
 	@ResponseBody
 	public List<CodeDTO> schoolName(CodeDTO dto){
 			
-		System.out.println(dto.getCode()+"code");
-		System.out.println(dto.getName()+"name");
 		List<CodeDTO> schoolName = this.boardDAOImpl.schoolname(dto);
 		
 		return schoolName;
 		
 	}
 	
-	
+	// 학교구분과 전공명 검색 시 해당 전공 데이터 불러오기
 	@PostMapping("get_department")
 	@ResponseBody
 	public List<CodeDTO> departmentName(CodeDTO dto){
-		/*
-		 * Map<String, String> department = new HashMap<>();
-		 * 
-		 * department.put("code", code); department.put("m_name", m_name);
-		 */
-	    		
-		
+	
 		List<CodeDTO> departmentName = this.boardDAOImpl.departmentCode(dto);
 		
 		return departmentName;
 		
 	}
 	
+	// 해당 자격증 리스트 불러오기
 	@PostMapping("search_certifications")
 	@ResponseBody
 	public List<license> searchlicense(@RequestParam("license_name") String license_name){
 		
-		System.out.println(license_name+"license_name");
-		
 		List<license> licenseList = this.boardDAOImpl.searchlicense(license_name);
 		
-		System.out.println(licenseList.size());
-	
 		
 		return licenseList;
 		
 	}
 	
+	// 데이터 넘어오는 지 test
 	@PostMapping("dateReqTest")
 	public String dateReqTest(Model model,@ModelAttribute(value = "CodeListDTO") CodeListDTO li) {
 		System.out.println(li);
@@ -166,7 +161,7 @@ public class ProfileController {
 		return "profile_List";
 	}
 	
-	// 이력서 상세보기
+	// 해당 프로필 키 이력서 상세보기
 	@GetMapping("profile_content")
 	public String profileContent(@RequestParam("no") int no,Model model) {
 		
