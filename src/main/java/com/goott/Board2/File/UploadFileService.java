@@ -22,7 +22,7 @@ public String upload(MultipartFile file) {
 				fileOriName.substring(fileOriName.lastIndexOf("."), fileOriName.length());
 		
 		//업로드된 파일이 저장될 디렉토리를 지정
-		String uploadDir = "src/main/resources/image/profile_image/";
+		String uploadDir = "C:\\JAVA\\workspace(spring_boot)\\Board2\\src\\main\\resources\\image\\profile_image";
 		
 		//업로드된 파일을 위한 고유 식별자(UUID)를 생성
 		UUID uuid = UUID.randomUUID();
